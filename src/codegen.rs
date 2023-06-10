@@ -1,17 +1,17 @@
-pub enum AstNode {
+pub enum PrintNode {
     Literal {
         value: String,
     },
     Wrapped {
         format: String,
-        children: Vec<AstNode>,
+        children: Vec<PrintNode>,
     },
 }
 
-pub fn generate(node: &AstNode) -> Option<String> {
+pub fn generate(node: &PrintNode) -> Option<String> {
     match node {
-        AstNode::Literal { value } => return Some(value.clone()),
-        AstNode::Wrapped { children, format } => {
+        PrintNode::Literal { value } => return Some(value.clone()),
+        PrintNode::Wrapped { children, format } => {
             if let Some(child) = generate(&children[0]) {
                 return Some(format.replace("{:1}", &child));
             }
@@ -26,7 +26,7 @@ mod tests {
 
     #[test]
     fn can_print_identifiers() {
-        let node = AstNode::Literal {
+        let node = PrintNode::Literal {
             value: String::from("hello"),
         };
         let want = String::from("hello");
@@ -37,9 +37,9 @@ mod tests {
 
     #[test]
     fn can_print_wrapped_identifiers() {
-        let node = AstNode::Wrapped {
+        let node = PrintNode::Wrapped {
             format: String::from("'{:1}'"),
-            children: vec![AstNode::Literal {
+            children: vec![PrintNode::Literal {
                 value: String::from("hello"),
             }],
         };
