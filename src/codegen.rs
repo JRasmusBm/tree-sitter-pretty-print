@@ -2,7 +2,7 @@ pub enum PrintNode {
     Literal {
         value: String,
     },
-    Wrapped {
+    Composite {
         format: String,
         children: Vec<PrintNode>,
     },
@@ -11,9 +11,9 @@ pub enum PrintNode {
 pub fn generate(node: &PrintNode) -> Option<String> {
     match node {
         PrintNode::Literal { value } => return Some(value.clone()),
-        PrintNode::Wrapped { children, format } => {
+        PrintNode::Composite { children, format } => {
             if let Some(child) = generate(&children[0]) {
-                return Some(format.replace("{:1}", &child));
+                return Some(format.replace("{:}", &child));
             }
             return None;
         }
@@ -37,8 +37,8 @@ mod tests {
 
     #[test]
     fn can_print_wrapped_identifiers() {
-        let node = PrintNode::Wrapped {
-            format: String::from("'{:1}'"),
+        let node = PrintNode::Composite {
+            format: String::from("'{:}'"),
             children: vec![PrintNode::Literal {
                 value: String::from("hello"),
             }],
