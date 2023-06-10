@@ -1,10 +1,8 @@
 mod codegen;
 
 fn main() {
-    if let Some(result) = codegen::generate(&codegen::AstNode {
-        kind: codegen::AstKind::Literal,
-        format: String::from("hello"),
-        children: vec![],
+    if let Some(result) = codegen::generate(&codegen::AstNode::Literal {
+        value: String::from("hello"),
     }) {
         println!("{}", result);
     } else {
