@@ -1,19 +1,16 @@
-mod codegen {
-        
-    #[cfg(test)]
-    mod tests {
-        use super::*;
+pub fn generate() -> String {
+    return "hello".to_string();
+}
 
-        #[test]
-        fn can_print_identifiers() {
-            let want = "hello" ;
-            let got = codegen();
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-            assert_eq!(want, got);
-        }
-    }
+    #[test]
+    fn can_print_identifiers() {
+        let want = "hello";
+        let got = generate();
 
-    fn codegen() -> String {
-        return "hello".to_string();
+        assert_eq!(want, got);
     }
 }
