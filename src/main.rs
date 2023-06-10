@@ -1,7 +1,7 @@
 mod codegen;
 
 fn main() {
-    if let Some(result) = codegen::generate(&codegen::PrintNode::Literal {
+    if let Ok(result) = codegen::generate(&codegen::PrintNode::Literal {
         value: String::from("hello"),
     }) {
         println!("{}", result);

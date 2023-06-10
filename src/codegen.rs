@@ -8,14 +8,14 @@ pub enum PrintNode {
     },
 }
 
-pub fn generate(node: &PrintNode) -> Option<String> {
+pub fn generate(node: &PrintNode) -> Result<String, &'static str> {
     match node {
-        PrintNode::Literal { value } => return Some(value.clone()),
+        PrintNode::Literal { value } => return Ok(value.clone()),
         PrintNode::Composite { children, format } => {
-            if let Some(child) = generate(&children[0]) {
-                return Some(format.replace("{:}", &child));
+            match generate(&children[0]) {
+                Ok(child) => Ok(format.replace("{:}", &child)),
+                Err(msg) => Err(msg)
             }
-            return None;
         }
     }
 }
