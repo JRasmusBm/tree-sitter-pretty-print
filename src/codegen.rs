@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 pub enum PrintNode {
     Literal {
         value: String,
@@ -8,13 +10,24 @@ pub enum PrintNode {
     },
 }
 
-pub fn generate(node: &PrintNode) -> Result<String, &'static str> {
+pub fn generate(node: &PrintNode) -> Result<String, String> {
     match node {
         PrintNode::Literal { value } => return Ok(value.clone()),
         PrintNode::Composite { children, format } => {
-            match generate(&children[0]) {
-                Ok(child) => Ok(format.replace("{:}", &child)),
-                Err(msg) => Err(msg)
+            match children
+                .iter()
+                .map(generate)
+                .collect::<Result<Vec<String>, String>>()
+            {
+                Ok(child_strings) => {
+                    return Ok(format
+                        .split("{:}")
+                        .interleave(child_strings.iter().map(|s| s.as_str()))
+                        .map(|s| s.to_string())
+                        .collect::<Vec<String>>()
+                        .join(""));
+                }
+                Err(msg) => Err(msg),
             }
         }
     }
@@ -44,6 +57,56 @@ mod tests {
             }],
         };
         let want = String::from("'hello'");
+        let got = generate(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
+
+        assert_eq!(want, got);
+    }
+
+    #[test]
+    fn a_more_complicated_example() {
+        let node = PrintNode::Composite {
+            format: String::from(
+                "if ({:}) {
+    {:}
+} else {
+    {:}
+}
+",
+            ),
+            children: vec![
+                PrintNode::Composite {
+                    format: String::from("{:} < {:}"),
+                    children: vec![
+                        PrintNode::Literal {
+                            value: String::from("a"),
+                        },
+                        PrintNode::Literal {
+                            value: String::from("2"),
+                        },
+                    ],
+                },
+                PrintNode::Composite {
+                    format: String::from("return {:};"),
+                    children: vec![PrintNode::Literal {
+                        value: String::from("true"),
+                    }],
+                },
+                PrintNode::Composite {
+                    format: String::from("return {:};"),
+                    children: vec![PrintNode::Literal {
+                        value: String::from("false"),
+                    }],
+                },
+            ],
+        };
+        let want = String::from(
+            "if (a < 2) {
+    return true;
+} else {
+    return false;
+}
+",
+        );
         let got = generate(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
 
         assert_eq!(want, got);
