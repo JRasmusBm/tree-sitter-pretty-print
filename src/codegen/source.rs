@@ -4,7 +4,11 @@ use itertools::Itertools;
 pub fn generate(node: &ast::AstNode) -> Result<String, String> {
     match node {
         ast::AstNode::Literal { value } => return Ok(value.clone()),
-        ast::AstNode::Composite { children, format } => {
+        ast::AstNode::Composite {
+            children,
+            format,
+            name: _,
+        } => {
             match children
                 .iter()
                 .map(generate)
@@ -27,6 +31,7 @@ pub fn generate(node: &ast::AstNode) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    const DOES_NOT_MATTER: &str = "abc";
 
     #[test]
     fn can_print_identifiers() {
@@ -42,6 +47,7 @@ mod tests {
     #[test]
     fn can_print_wrapped_identifiers() {
         let node = ast::AstNode::Composite {
+            name: String::from(DOES_NOT_MATTER),
             format: format!("'{}'", ast::PLACEHOLDER),
             children: vec![ast::AstNode::Literal {
                 value: String::from("hello"),
@@ -56,6 +62,7 @@ mod tests {
     #[test]
     fn a_more_complicated_example() {
         let node = ast::AstNode::Composite {
+            name: String::from(DOES_NOT_MATTER),
             format: format!(
                 "if ({}) {{
     {}
@@ -69,6 +76,7 @@ mod tests {
             ),
             children: vec![
                 ast::AstNode::Composite {
+                    name: String::from(DOES_NOT_MATTER),
                     format: format!("{} < {}", ast::PLACEHOLDER, ast::PLACEHOLDER),
                     children: vec![
                         ast::AstNode::Literal {
@@ -80,12 +88,14 @@ mod tests {
                     ],
                 },
                 ast::AstNode::Composite {
+                    name: String::from(DOES_NOT_MATTER),
                     format: format!("return {};", ast::PLACEHOLDER),
                     children: vec![ast::AstNode::Literal {
                         value: String::from("true"),
                     }],
                 },
                 ast::AstNode::Composite {
+                    name: String::from(DOES_NOT_MATTER),
                     format: format!("return {};", ast::PLACEHOLDER),
                     children: vec![ast::AstNode::Literal {
                         value: String::from("false"),

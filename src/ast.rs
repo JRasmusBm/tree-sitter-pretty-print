@@ -5,6 +5,7 @@ pub enum AstNode {
         value: String,
     },
     Composite {
+        name: String,
         format: String,
         children: Vec<AstNode>,
     },
