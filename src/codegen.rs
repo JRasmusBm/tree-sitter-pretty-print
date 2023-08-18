@@ -1,5 +1,7 @@
 use itertools::Itertools;
 
+const PLACEHOLDER: &str = "{::}";
+
 pub enum PrintNode {
     Literal {
         value: String,
@@ -21,7 +23,7 @@ pub fn generate(node: &PrintNode) -> Result<String, String> {
             {
                 Ok(child_strings) => {
                     return Ok(format
-                        .split("{:}")
+                        .split(PLACEHOLDER)
                         .interleave(child_strings.iter().map(|s| s.as_str()))
                         .map(|s| s.to_string())
                         .collect::<Vec<String>>()
@@ -51,7 +53,7 @@ mod tests {
     #[test]
     fn can_print_wrapped_identifiers() {
         let node = PrintNode::Composite {
-            format: String::from("'{:}'"),
+            format: format!("'{}'", PLACEHOLDER),
             children: vec![PrintNode::Literal {
                 value: String::from("hello"),
             }],
@@ -65,17 +67,18 @@ mod tests {
     #[test]
     fn a_more_complicated_example() {
         let node = PrintNode::Composite {
-            format: String::from(
-                "if ({:}) {
-    {:}
-} else {
-    {:}
-}
+            format: format!(
+                "if ({}) {{
+    {}
+}} else {{
+    {}
+}}
 ",
+                PLACEHOLDER, PLACEHOLDER, PLACEHOLDER,
             ),
             children: vec![
                 PrintNode::Composite {
-                    format: String::from("{:} < {:}"),
+                    format: format!("{} < {}", PLACEHOLDER, PLACEHOLDER),
                     children: vec![
                         PrintNode::Literal {
                             value: String::from("a"),
@@ -86,13 +89,13 @@ mod tests {
                     ],
                 },
                 PrintNode::Composite {
-                    format: String::from("return {:};"),
+                    format: format!("return {};", PLACEHOLDER),
                     children: vec![PrintNode::Literal {
                         value: String::from("true"),
                     }],
                 },
                 PrintNode::Composite {
-                    format: String::from("return {:};"),
+                    format: format!("return {};", PLACEHOLDER),
                     children: vec![PrintNode::Literal {
                         value: String::from("false"),
                     }],
