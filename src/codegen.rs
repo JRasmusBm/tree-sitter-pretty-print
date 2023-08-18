@@ -12,13 +12,13 @@ pub enum PrintNode {
     },
 }
 
-pub fn generate(node: &PrintNode) -> Result<String, String> {
+pub fn generate_code(node: &PrintNode) -> Result<String, String> {
     match node {
         PrintNode::Literal { value } => return Ok(value.clone()),
         PrintNode::Composite { children, format } => {
             match children
                 .iter()
-                .map(generate)
+                .map(generate_code)
                 .collect::<Result<Vec<String>, String>>()
             {
                 Ok(child_strings) => {
@@ -45,7 +45,7 @@ mod tests {
             value: String::from("hello"),
         };
         let want = String::from("hello");
-        let got = generate(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
+        let got = generate_code(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
 
         assert_eq!(want, got);
     }
@@ -59,7 +59,7 @@ mod tests {
             }],
         };
         let want = String::from("'hello'");
-        let got = generate(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
+        let got = generate_code(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
 
         assert_eq!(want, got);
     }
@@ -110,7 +110,7 @@ mod tests {
 }
 ",
         );
-        let got = generate(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
+        let got = generate_code(&node).unwrap_or(String::from("NOT IMPLEMENTED!"));
 
         assert_eq!(want, got);
     }
