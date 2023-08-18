@@ -1,7 +1,8 @@
+mod ast;
 mod codegen;
 
 fn main() {
-    if let Ok(result) = codegen::generate(&codegen::PrintNode::Literal {
+    if let Ok(result) = codegen::source::generate(&ast::AstNode::Literal {
         value: String::from("hello"),
     }) {
         println!("{}", result);
