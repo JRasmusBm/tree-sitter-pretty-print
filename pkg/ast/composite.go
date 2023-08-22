@@ -10,6 +10,7 @@ const PLACEHOLDER string = "{::}"
 
 type Node interface {
 	CodeString() (string, error)
+	TreeString() (string, error)
 }
 
 type composite struct {
@@ -56,4 +57,8 @@ func (c *composite) CodeString() (string, error) {
 	}
 
 	return result, err
+}
+
+func (c *composite) TreeString() (string, error) {
+	return "", errors.New("Not implemented!")
 }
