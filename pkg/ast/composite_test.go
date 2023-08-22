@@ -35,10 +35,28 @@ func assertError(t testing.TB, err error, want string) {
 func TestCompositeCodeString(t *testing.T) {
 	t.Run("Applies formatting to the children", func(t *testing.T) {
 
-		got, err := ast.NewComposite(fmt.Sprintf("(%s)", ast.PLACEHOLDER), []ast.Node{
-			ast.NewLiteral("hello"),
+		got, err := ast.NewComposite(fmt.Sprintf(`if (%s) {
+  %s
+} else {
+  %s
+}`, ast.PLACEHOLDER, ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
+			ast.NewLiteral("isOpen"),
+			ast.NewComposite(fmt.Sprintf("%s(%s);", ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
+				ast.NewComposite(fmt.Sprintf("%s.%s", ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
+					ast.NewLiteral("console"),
+					ast.NewLiteral("log"),
+				}),
+				ast.NewLiteral("42"),
+			}),
+			ast.NewComposite(fmt.Sprintf("return %s;", ast.PLACEHOLDER), []ast.Node{
+				ast.NewLiteral("null"),
+			}),
 		}).CodeString()
-		want := "(hello)"
+		want := `if (isOpen) {
+  console.log(42);
+} else {
+  return null;
+}`
 
 		assertStringsMatch(t, got, want, err)
 	})
