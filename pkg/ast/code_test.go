@@ -34,22 +34,21 @@ func assertError(t testing.TB, err error, want string) {
 
 func TestCompositeCodeString(t *testing.T) {
 	t.Run("Applies formatting to the children", func(t *testing.T) {
-
-		got, err := ast.NewComposite(fmt.Sprintf(`if (%s) {
+		got, err := ast.New(fmt.Sprintf(`if (%s) {
   %s
 } else {
   %s
 }`, ast.PLACEHOLDER, ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
-			ast.NewLiteral("isOpen"),
-			ast.NewComposite(fmt.Sprintf("%s(%s);", ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
-				ast.NewComposite(fmt.Sprintf("%s.%s", ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
-					ast.NewLiteral("console"),
-					ast.NewLiteral("log"),
+			ast.New("isOpen", []ast.Node{}),
+			ast.New(fmt.Sprintf("%s(%s);", ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
+				ast.New(fmt.Sprintf("%s.%s", ast.PLACEHOLDER, ast.PLACEHOLDER), []ast.Node{
+					ast.New("console", []ast.Node{}),
+					ast.New("log", []ast.Node{}),
 				}),
-				ast.NewLiteral("42"),
+				ast.New("42", []ast.Node{}),
 			}),
-			ast.NewComposite(fmt.Sprintf("return %s;", ast.PLACEHOLDER), []ast.Node{
-				ast.NewLiteral("null"),
+			ast.New(fmt.Sprintf("return %s;", ast.PLACEHOLDER), []ast.Node{
+				ast.New("null", []ast.Node{}),
 			}),
 		}).CodeString()
 		want := `if (isOpen) {
@@ -61,12 +60,19 @@ func TestCompositeCodeString(t *testing.T) {
 		assertStringsMatch(t, got, want, err)
 	})
 
+	t.Run("Renders nodes without placeholders", func(t *testing.T) {
+		got, err := ast.New(fmt.Sprintf("hello"), []ast.Node{}).CodeString()
+		want := `hello`
+
+		assertStringsMatch(t, got, want, err)
+	})
+
 	t.Run("Returns error on placeholder mismatch", func(t *testing.T) {
-		_, err := ast.NewComposite(
+		_, err := ast.New(
 			fmt.Sprintf("(%s, %s, %s)", ast.PLACEHOLDER, ast.PLACEHOLDER, ast.PLACEHOLDER),
 			[]ast.Node{
-				ast.NewLiteral("hello"),
-				ast.NewLiteral("world"),
+				ast.New("hello", []ast.Node{}),
+				ast.New("world", []ast.Node{}),
 			},
 		).CodeString()
 

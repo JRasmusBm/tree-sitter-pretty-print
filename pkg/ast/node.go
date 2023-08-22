@@ -13,16 +13,16 @@ type Node interface {
 	TreeString() (string, error)
 }
 
-type composite struct {
+type node struct {
 	layout   string
 	children []Node
 }
 
-func NewComposite(layout string, children []Node) *composite {
-	return &composite{layout: layout, children: children}
+func New(layout string, children []Node) *node {
+	return &node{layout: layout, children: children}
 }
 
-func validateChildren(c *composite) error {
+func validateLayout(c *node) error {
 	nPlaceholders := strings.Count(c.layout, PLACEHOLDER)
 	nChildren := len(c.children)
 	if nChildren != nPlaceholders {
@@ -38,8 +38,8 @@ func validateChildren(c *composite) error {
 	return nil
 }
 
-func (c *composite) CodeString() (string, error) {
-	err := validateChildren(c)
+func (c *node) CodeString() (string, error) {
+	err := validateLayout(c)
 	if err != nil {
 		return "", err
 	}
@@ -59,6 +59,6 @@ func (c *composite) CodeString() (string, error) {
 	return result, err
 }
 
-func (c *composite) TreeString() (string, error) {
+func (c *node) TreeString() (string, error) {
 	return "", errors.New("Not implemented!")
 }
