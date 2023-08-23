@@ -8,10 +8,11 @@ type Node interface {
 }
 
 type node struct {
+	name     string
 	layout   string
 	children []Node
 }
 
-func New(layout string, children []Node) *node {
-	return &node{layout: layout, children: children}
+func New(name, layout string, children []Node) *node {
+	return &node{name: name, layout: layout, children: children}
 }
