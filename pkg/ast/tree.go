@@ -1,9 +1,9 @@
 package ast
 
 import (
-	"errors"
+	"fmt"
 )
 
 func (c *node) TreeString() (string, error) {
-	return "", errors.New("Not implemented!")
+	return fmt.Sprintf("(%s)", c.name), nil
 }
